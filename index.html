@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#102b46">
+    <meta name="description" content="Panel estático para analizar órdenes de trabajo CMMS y generar informes ejecutivos de mantenimiento.">
+    <title>GMAO | Analítica de mantenimiento</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#inicio" aria-label="GMAO, inicio">
+          <span class="brand-mark">G</span>
+          <span><strong>GMAO</strong><small>ANALÍTICA DE ACTIVOS</small></span>
+        </a>
+
+        <div class="sidebar-caption">ESPACIO DE TRABAJO</div>
+        <nav class="main-nav" aria-label="Navegación principal">
+          <a class="nav-link active" href="#inicio"><span class="nav-icon">◫</span>Resumen ejecutivo</a>
+          <a class="nav-link" href="#estrategia"><span class="nav-icon">◉</span>Estrategia de mantenimiento</a>
+          <a class="nav-link" href="#fallas"><span class="nav-icon">⌁</span>Modos de falla</a>
+          <a class="nav-link" href="#activos"><span class="nav-icon">◇</span>Criticidad de activos</a>
+          <a class="nav-link" href="#datos"><span class="nav-icon">▤</span>Datos y metodología</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="privacy-note"><span class="privacy-icon">⌑</span><span><strong>Procesamiento local</strong><small>Los datos no salen de este dispositivo.</small></span></div>
+          <div class="sidebar-version">GMAO · CMMS <span>ESTÁTICO</span></div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="inicio">
+        <header class="topbar">
+          <div class="breadcrumbs">GESTIÓN DE ACTIVOS <span>/</span> <strong>ANÁLISIS</strong></div>
+          <div class="topbar-actions">
+            <span class="data-status"><i></i><span id="statusText">Cargando dataset</span></span>
+            <button class="button button-outline" id="printButton" type="button"><span aria-hidden="true">⇩</span> Exportar informe PDF</button>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <section class="page-heading">
+            <div>
+              <div class="eyebrow">PANEL DE CONFIABILIDAD <span class="heading-dot"></span> <span id="periodLabel">PERÍODO COMPLETO</span></div>
+              <h1>Gestión de mantenimiento</h1>
+              <p class="subtitle">Una lectura ejecutiva de la actividad, la mantenibilidad y las prioridades operacionales.</p>
+            </div>
+            <div class="heading-meta"><span class="meta-label">DATASET ACTIVO</span><strong id="datasetName">Preparando análisis…</strong></div>
+          </section>
+
+          <section class="filter-bar" aria-label="Filtros del análisis">
+            <label class="filter-field"><span>Tipo de mantenimiento</span><select id="maintenanceFilter"><option value="all">Todos los tipos</option></select></label>
+            <label class="filter-field"><span>Desde</span><input id="dateFrom" type="date"></label>
+            <label class="filter-field"><span>Hasta</span><input id="dateTo" type="date"></label>
+            <button class="button button-quiet" id="resetFilters" type="button">Restablecer</button>
+            <div class="filter-spacer"></div>
+            <button class="button button-primary" id="uploadButton" type="button"><span aria-hidden="true">＋</span> Cargar dataset</button>
+            <input class="visually-hidden" id="fileInput" type="file" accept=".csv,text/csv">
+          </section>
+          <div class="filter-hint">Los filtros actualizan los indicadores, gráficos y tablas del informe.</div>
+
+          <section class="kpi-grid" aria-label="Indicadores principales">
+            <article class="kpi-card"><div class="kpi-label">ÓRDENES DE TRABAJO <span class="kpi-symbol">▤</span></div><div class="kpi-value" id="kpiOrders">—</div><div class="kpi-foot">OT únicas en el período</div></article>
+            <article class="kpi-card"><div class="kpi-label">HORAS-HOMBRE <span class="kpi-symbol">◷</span></div><div class="kpi-value" id="kpiLabor">—</div><div class="kpi-foot">Esfuerzo de mantenimiento</div></article>
+            <article class="kpi-card"><div class="kpi-label">DOWNTIME TOTAL <span class="kpi-symbol">◴</span></div><div class="kpi-value" id="kpiDowntime">—</div><div class="kpi-foot">Horas de indisponibilidad</div></article>
+            <article class="kpi-card"><div class="kpi-label">COSTO DIRECTO <span class="kpi-symbol">$</span></div><div class="kpi-value compact" id="kpiCost">—</div><div class="kpi-foot">Costo total registrado · CLP</div></article>
+            <article class="kpi-card"><div class="kpi-label">MTTR CORRECTIVO <span class="kpi-symbol">↗</span></div><div class="kpi-value" id="kpiMttr">—</div><div class="kpi-foot">Promedio de reparación válida</div></article>
+            <article class="kpi-card"><div class="kpi-label">MEDIANA DE REPARACIÓN <span class="kpi-symbol">⌁</span></div><div class="kpi-value" id="kpiMedian">—</div><div class="kpi-foot">Órdenes correctivas válidas</div></article>
+          </section>
+
+          <section class="insight-banner" id="insightBanner">
+            <div class="insight-icon">✳</div>
+            <div><span class="insight-label">HALLAZGO CLAVE DEL DIAGNÓSTICO</span><p id="insightText">Cargando análisis del dataset…</p></div>
+          </section>
+
+          <section class="report-section" id="estrategia">
+            <div class="section-heading"><div><div class="eyebrow">01 / ESTRATEGIA</div><h2>Impacto por tipo de mantenimiento</h2><p>Distribución de órdenes, recursos, indisponibilidad y costo directo.</p></div><span class="section-index">01</span></div>
+            <div class="panel-grid panel-grid-two">
+              <article class="panel">
+                <div class="panel-heading"><div><h3>Participación en indicadores</h3><p>Porcentaje del total para cada estrategia</p></div><span class="panel-tag">COMPARATIVO</span></div>
+                <div id="mixChart" class="chart-area" role="img" aria-label="Gráfico comparativo por tipo de mantenimiento"></div>
+                <div id="mixLegend" class="chart-legend"></div>
+              </article>
+              <article class="panel">
+                <div class="panel-heading"><div><h3>Distribución de órdenes</h3><p>Volumen de OT por tipo</p></div><span class="panel-tag">NÚMERO DE OT</span></div>
+                <div id="ordersChart" class="chart-area" role="img" aria-label="Órdenes de trabajo por tipo de mantenimiento"></div>
+              </article>
+            </div>
+            <article class="panel table-panel">
+              <div class="panel-heading"><div><h3>Resumen de gestión</h3><p>Volumen e impacto por tipo de mantenimiento</p></div></div>
+              <div class="table-scroll"><table><thead><tr><th>Tipo</th><th>Órdenes</th><th>% OT</th><th>Horas-hombre</th><th>% HH</th><th>Downtime</th><th>% Downtime</th><th>Costo directo</th><th>% Costo</th></tr></thead><tbody id="mixTable"></tbody></table></div>
+            </article>
+          </section>
+
+          <section class="report-section" id="fallas">
+            <div class="section-heading"><div><div class="eyebrow">02 / CONFIABILIDAD</div><h2>Modos de falla prioritarios</h2><p>Concentración de recurrencia, downtime y costo directo para orientar la acción.</p></div><span class="section-index">02</span></div>
+            <div class="panel-grid panel-grid-three">
+              <article class="panel"><div class="panel-heading"><div><h3>Más recurrentes</h3><p>Top 10 por número de OT</p></div><span class="panel-tag">FRECUENCIA</span></div><div class="chart-area chart-area-tall" id="failureCountChart" role="img" aria-label="Modos de falla más recurrentes"></div></article>
+              <article class="panel"><div class="panel-heading"><div><h3>Mayor indisponibilidad</h3><p>Top 10 por downtime acumulado</p></div><span class="panel-tag">HORAS</span></div><div class="chart-area chart-area-tall" id="failureDowntimeChart" role="img" aria-label="Modos de falla con más downtime"></div></article>
+              <article class="panel"><div class="panel-heading"><div><h3>Mayor costo</h3><p>Top 10 por costo directo</p></div><span class="panel-tag">CLP</span></div><div class="chart-area chart-area-tall" id="failureCostChart" role="img" aria-label="Modos de falla con más costo"></div></article>
+            </div>
+          </section>
+
+          <section class="report-section" id="activos">
+            <div class="section-heading"><div><div class="eyebrow">03 / MANTENIBILIDAD</div><h2>Prioridad operacional de activos</h2><p>MTTR correctivo y clasificación Jack-Knife para focalizar intervenciones.</p></div><span class="section-index">03</span></div>
+            <div class="panel-grid panel-grid-two">
+              <article class="panel"><div class="panel-heading"><div><h3>MTTR por tipo de equipo</h3><p>Promedio de horas por reparación correctiva válida</p></div><span class="panel-tag">MTTR · H</span></div><div class="chart-area" id="mttrChart" role="img" aria-label="MTTR por tipo de equipo"></div></article>
+              <article class="panel"><div class="panel-heading"><div><h3>Jack-Knife de equipos</h3><p>Frecuencia relativa vs. MTTR relativo</p></div><span class="panel-tag">RIESGO RELATIVO</span></div><div class="chart-area" id="jackknifeChart" role="img" aria-label="Diagrama Jack-Knife de activos"></div><div class="quadrant-legend"><span><i class="dot dot-severe"></i>Grave</span><span><i class="dot dot-chronic"></i>Crónico</span><span><i class="dot dot-acute"></i>Agudo</span><span><i class="dot dot-controlled"></i>Bajo control</span></div></article>
+            </div>
+            <div class="panel-grid panel-grid-three">
+              <article class="panel"><div class="panel-heading"><div><h3>Activos con mayor downtime</h3><p>Top 10 por horas acumuladas</p></div><span class="panel-tag">HORAS</span></div><div class="chart-area chart-area-tall" id="assetDowntimeChart" role="img" aria-label="Activos con mayor downtime acumulado"></div></article>
+              <article class="panel"><div class="panel-heading"><div><h3>Activos con mayor costo</h3><p>Top 10 por costo directo acumulado</p></div><span class="panel-tag">CLP</span></div><div class="chart-area chart-area-tall" id="assetCostChart" role="img" aria-label="Activos con mayor costo directo"></div></article>
+              <article class="panel"><div class="panel-heading"><div><h3>Jack-Knife de modos de falla</h3><p>Frecuencia relativa vs. MTTR relativo</p></div><span class="panel-tag">RIESGO RELATIVO</span></div><div class="chart-area chart-area-tall" id="modeJackknifeChart" role="img" aria-label="Diagrama Jack-Knife de modos de falla"></div><div class="quadrant-legend"><span><i class="dot dot-severe"></i>Grave</span><span><i class="dot dot-chronic"></i>Crónico</span><span><i class="dot dot-acute"></i>Agudo</span><span><i class="dot dot-controlled"></i>Bajo control</span></div></article>
+            </div>
+            <article class="panel table-panel">
+              <div class="panel-heading"><div><h3>Activos con mayor riesgo relativo</h3><p>Ranking Jack-Knife calculado sobre correctivos cerrados con downtime válido</p></div><span class="panel-tag">TOP 10</span></div>
+              <div class="table-scroll"><table><thead><tr><th>Equipo</th><th>Tipo</th><th>Criticidad</th><th>Fallas</th><th>MTTR JK</th><th>Downtime</th><th>Riesgo R*</th><th>Clasificación</th></tr></thead><tbody id="assetTable"></tbody></table></div>
+            </article>
+            <article class="panel table-panel">
+              <div class="panel-heading"><div><h3>Modos de falla con mayor riesgo relativo</h3><p>Relación entre frecuencia y duración de indisponibilidad</p></div><span class="panel-tag">TOP 10</span></div>
+              <div class="table-scroll"><table><thead><tr><th>Modo de falla</th><th>Fallas</th><th>MTTR JK</th><th>Downtime</th><th>Riesgo R*</th><th>Clasificación</th></tr></thead><tbody id="modeTable"></tbody></table></div>
+            </article>
+          </section>
+
+          <section class="report-section" id="datos">
+            <div class="section-heading"><div><div class="eyebrow">04 / TRAZABILIDAD</div><h2>Datos y metodología</h2><p>Alcance del análisis y controles aplicados al archivo CMMS.</p></div><span class="section-index">04</span></div>
+            <div class="method-grid">
+              <article class="panel method-card"><span class="method-number">01</span><h3>Origen</h3><p id="sourceDescription">Dataset CMMS de ejemplo cargado desde la estructura del proyecto.</p></article>
+              <article class="panel method-card"><span class="method-number">02</span><h3>Validación</h3><p id="qualityDescription">Los encabezados se validan antes de procesar los registros.</p></article>
+              <article class="panel method-card"><span class="method-number">03</span><h3>Reglas de cálculo</h3><p>Se normalizan categorías, se descartan filas idénticas y el MTTR considera correctivos cerrados con inicio y término válidos.</p></article>
+            </div>
+            <div class="data-footer"><span>Creado por Marcelo Cisternas Fernández</span><span id="reportDate"></span><span>Los archivos se procesan localmente en este dispositivo</span></div>
+          </section>
+          <footer class="app-footer"><span>GMAO · Gestión de mantenimiento</span><span>Creado por Marcelo Cisternas Fernández</span></footer>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
